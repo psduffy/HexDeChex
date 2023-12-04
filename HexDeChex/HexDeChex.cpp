@@ -1,81 +1,73 @@
 // HexDeChex.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <algorithm>
 #include <cctype>
 
-bool IsDecimal(const std::string &value)
-{
-	return std::all_of(value.begin(), value.end(), ::isdigit);
+bool IsHexadecimal(const std::string& value) {
+    // Check for "0x" or "0X" prefix for hexadecimal
+    if (value.size() > 2 && (value[0] == '0' && (value[1] == 'x' || value[1] == 'X'))) {
+        // Check the rest of the string
+        return std::all_of(value.begin() + 2, value.end(), [](char c) {
+            return std::isdigit(c) || (std::toupper(c) >= 'A' && std::toupper(c) <= 'F');
+            });
+    }
+    return false;
 }
 
-bool IsHexadecimal(const std::string &value)
-{
-	return std::all_of(value.begin(), value.end(), [](char c)
-		{
-			return std::isdigit(c) || (std::toupper(c) >= 'A' && std::toupper(c) <= 'F');
-		});
+std::string DecimalToHex(int decimal) {
+    std::stringstream ss;
+    ss << std::hex << decimal;
+    return ss.str();
 }
 
-
-std::string DecimalToHex(int decimal)
-{
-	std::stringstream ss;
-	ss << std::hex << decimal;
-	return ss.str();
+int HexToDecimal(const std::string& hex) {
+    int decimal;
+    std::stringstream ss;
+    ss << std::hex << hex;
+    ss >> decimal;
+    return decimal;
 }
-
-
-int HexToDecimal(const std::string &hex)
-{
-	int decimal;
-	std::stringstream ss;
-	ss << std::hex << hex;
-	ss >> decimal;
-	return decimal;
-}
-
-
-
-// MAIN below
-
-
 
 int main() {
-	std::string inputValue;
+    std::string inputValue;
 
-	while (true) {
-		std::cout << "Enter a decimal or hexadecimal number (or type 'exit' to quit): ";
-		std::getline(std::cin, inputValue);
+    while (true) {
+        std::cout << "Enter a decimal or hexadecimal number (prefix hex with '0x'; type 'exit' to quit): ";
+        std::getline(std::cin, inputValue);
 
-		if (inputValue == "exit") {
-			break;
-		}
+        if (inputValue == "exit") {
+            break;
+        }
 
-		std::string outputValue;
+        std::string outputValue;
 
-		if (IsDecimal(inputValue)) {
-			int decimalValue = std::stoi(inputValue);
-			outputValue = "Hex: " + DecimalToHex(decimalValue);
-		}
-		else if (IsHexadecimal(inputValue)) {
-			int decimalValue = HexToDecimal(inputValue);
-			outputValue = "Decimal: " + std::to_string(decimalValue);
-		}
-		else {
-			outputValue = "Invalid input.";
-		}
+        if (IsHexadecimal(inputValue)) {
+            // Extract the actual hex part (excluding "0x" or "0X")
+            std::string hexPart = inputValue.substr(2);
+            int decimalValue = HexToDecimal(hexPart);
+            outputValue = "Decimal: " + std::to_string(decimalValue);
+        }
+        else {
+            try {
+                int decimalValue = std::stoi(inputValue);
+                outputValue = "Hex: 0x" + DecimalToHex(decimalValue);
+            }
+            catch (const std::exception& e) {
+                outputValue = "Invalid input.";
+            }
+        }
 
-		std::cout << outputValue << std::endl;
-	}
+        std::cout << outputValue << std::endl;
+    }
 
-	std::cout << "Program exited. Press any key to close." << std::endl;
-	std::cin.get();
-	return 0;
+    std::cout << "Program exited. Press any key to close." << std::endl;
+    std::cin.get();
+    return 0;
 }
+
 
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
