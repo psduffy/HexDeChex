@@ -17,14 +17,14 @@ bool IsHexadecimal(const std::string& value) {
     return false;
 }
 
-std::string DecimalToHex(int decimal) {
+std::string DecimalToHex(long long decimal) {
     std::stringstream ss;
     ss << std::hex << decimal;
     return ss.str();
 }
 
-int HexToDecimal(const std::string& hex) {
-    int decimal;
+long long HexToDecimal(const std::string& hex) {
+    long long decimal;
     std::stringstream ss;
     ss << std::hex << hex;
     ss >> decimal;
@@ -47,12 +47,12 @@ int main() {
         if (IsHexadecimal(inputValue)) {
             // Extract the actual hex part (excluding "0x" or "0X")
             std::string hexPart = inputValue.substr(2);
-            int decimalValue = HexToDecimal(hexPart);
+            long long decimalValue = HexToDecimal(hexPart);
             outputValue = "Decimal: " + std::to_string(decimalValue);
         }
         else {
             try {
-                int decimalValue = std::stoi(inputValue);
+                long long decimalValue = std::stoll(inputValue);
                 outputValue = "Hex: 0x" + DecimalToHex(decimalValue);
             }
             catch (const std::exception& e) {
